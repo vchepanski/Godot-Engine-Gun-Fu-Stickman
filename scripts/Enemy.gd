@@ -84,12 +84,13 @@ func _draw() -> void:
 	var shoulder := Vector2(10, -12)
 	var arm_end := shoulder + Vector2(ARM_LENGTH, 0).rotated(_gun_angle)
 	draw_line(shoulder, arm_end, c, 2)
+	var flip_x := -1.0
 	var flip_y := -1.0 if (_gun_angle > PI / 2.0 or _gun_angle < -PI / 2.0) else 1.0
 	var tex := _gun_texture
 	var tex_w := tex.get_size().x
 	var tex_h := tex.get_size().y
-	draw_set_transform(arm_end, _gun_angle, Vector2(GUN_SCALE, GUN_SCALE * flip_y))
-	draw_texture(tex, Vector2(-tex_w * GRIP_OFFSET_X, -tex_h * 0.5))
+	draw_set_transform(arm_end, _gun_angle, Vector2(GUN_SCALE * flip_x, GUN_SCALE * flip_y))
+	draw_texture(tex, Vector2(-tex_w * (1.0 - GRIP_OFFSET_X), -tex_h * 0.5))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if urgency > 0.5:
 		var glow_alpha := (urgency - 0.5) / 0.5

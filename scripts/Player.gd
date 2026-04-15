@@ -228,12 +228,14 @@ func _draw_arm(shoulder: Vector2, angle: float, flash_timer: float, flash_color:
 	var arm_end := origin + Vector2(ARM_LENGTH, 0).rotated(angle)
 	var arm_color := Color.WHITE if not is_flashing else flash_color
 	draw_line(origin, arm_end, arm_color, 3)
+	var flip_x := -1.0
 	var flip_y := -1.0 if (angle > PI / 2.0 or angle < -PI / 2.0) else 1.0
+	var gun_angle := angle
 	var tex := _gun_texture
 	var tex_w := tex.get_size().x
 	var tex_h := tex.get_size().y
-	draw_set_transform(arm_end, angle, Vector2(GUN_SCALE, GUN_SCALE * flip_y))
-	draw_texture(tex, Vector2(-tex_w * GRIP_OFFSET_X, -tex_h * 0.5))
+	draw_set_transform(arm_end, gun_angle, Vector2(GUN_SCALE * flip_x, GUN_SCALE * flip_y))
+	draw_texture(tex, Vector2(-tex_w * (1.0 - GRIP_OFFSET_X), -tex_h * 0.5))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if is_flashing:
 		var barrel_length := tex_w * (1.0 - GRIP_OFFSET_X) * GUN_SCALE
