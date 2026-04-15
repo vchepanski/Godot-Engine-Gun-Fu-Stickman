@@ -8,9 +8,9 @@ const DIRECT_HIT_RADIUS := 50.0
 const ARM_LENGTH := 28.0
 const FLASH_DURATION := 0.08
 const RECOIL_DISTANCE := 8.0
-const GUN_SCALE := 0.1
+const GUN_SCALE := 0.06
 
-const GunTex := preload("res://assets/weapons/pistol_clean.png")
+var GunTex: Texture2D
 
 var lives: int = MAX_LIVES
 var _is_alive: bool = true
@@ -35,6 +35,7 @@ func _ready() -> void:
 	var img := Image.new()
 	img.load("res://assets/weapons/pistol_clean.png")
 	_gun_texture = ImageTexture.create_from_image(img)
+	GunTex = _gun_texture
 	_hit_player = AudioStreamPlayer.new()
 	_hit_player.stream = _generate_hit_sound()
 	add_child(_hit_player)

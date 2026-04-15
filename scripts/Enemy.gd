@@ -4,7 +4,7 @@ signal died
 signal shot_fired
 
 const ARM_LENGTH := 22.0
-const GUN_SCALE := 0.07
+const GUN_SCALE := 0.05
 
 var _is_dead: bool = false
 var _reaction_time: float
