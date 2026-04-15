@@ -4,7 +4,7 @@ signal died
 signal shot_fired
 
 const ARM_LENGTH := 22.0
-const GUN_LENGTH := 14.0
+const GUN_SCALE := 0.07
 
 var _is_dead: bool = false
 var _reaction_time: float
@@ -13,9 +13,11 @@ var _elapsed: float = 0.0
 var _dying: bool = false
 var _flash_timer: float = 0.0
 var _gun_angle: float = 0.0
+var _gun_texture: ImageTexture
 
 func _ready() -> void:
 	add_to_group("enemies")
+	_gun_texture = WeaponTex.get_clean_texture()
 	_reaction_time = randf_range(3.0, 5.0)
 	_timer = Timer.new()
 	_timer.one_shot = true
@@ -78,15 +80,17 @@ func _draw() -> void:
 	draw_line(Vector2(0, 12), Vector2(-12, 36), c, 2)
 	var shoulder := Vector2(10, -12)
 	var arm_end := shoulder + Vector2(ARM_LENGTH, 0).rotated(_gun_angle)
-	var gun_end := arm_end + Vector2(GUN_LENGTH, 0).rotated(_gun_angle)
-	var perp := Vector2(0, 1).rotated(_gun_angle)
-	var gun_c := Color.DARK_GRAY
 	draw_line(shoulder, arm_end, c, 2)
-	draw_line(arm_end, gun_end, gun_c, 4)
-	draw_line(arm_end, arm_end + perp * 6, gun_c, 2)
-	draw_line(gun_end + perp * 2, gun_end - perp * 2, gun_c, 1.5)
+	var tex := _gun_texture
+	var tex_size := tex.get_size() * GUN_SCALE
+	var offset := Vector2(-tex_size.x * 0.3, -tex_size.y * 0.5)
+	var draw_pos := arm_end + offset.rotated(_gun_angle)
+	draw_set_transform(draw_pos, _gun_angle, Vector2(GUN_SCALE, GUN_SCALE))
+	draw_texture(tex, Vector2.ZERO)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if urgency > 0.5:
 		var glow_alpha := (urgency - 0.5) / 0.5
+		var gun_end := arm_end + Vector2(tex_size.x * 0.7, 0).rotated(_gun_angle)
 		draw_circle(gun_end, 5, Color(1, 0.3, 0.0, glow_alpha * 0.5))
 		var target_end := gun_end + Vector2(40, 0).rotated(_gun_angle)
 		draw_line(gun_end, target_end, Color(1, 0.2, 0.2, glow_alpha * 0.3), 1)

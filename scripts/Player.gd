@@ -6,9 +6,9 @@ signal lives_depleted
 const MAX_LIVES := 3
 const DIRECT_HIT_RADIUS := 50.0
 const ARM_LENGTH := 28.0
-const GUN_LENGTH := 18.0
 const FLASH_DURATION := 0.08
 const RECOIL_DISTANCE := 8.0
+const GUN_SCALE := 0.1
 
 var lives: int = MAX_LIVES
 var _is_alive: bool = true
@@ -26,9 +26,11 @@ var _left_flash_color: Color = Color.YELLOW
 var _right_flash_color: Color = Color.YELLOW
 var _hit_player: AudioStreamPlayer
 var _miss_player: AudioStreamPlayer
+var _gun_texture: ImageTexture
 
 func _ready() -> void:
 	add_to_group("player")
+	_gun_texture = WeaponTex.get_clean_texture()
 	_hit_player = AudioStreamPlayer.new()
 	_hit_player.stream = _generate_hit_sound()
 	add_child(_hit_player)
@@ -218,16 +220,18 @@ func _draw_arm(shoulder: Vector2, angle: float, flash_timer: float, flash_color:
 	var recoil_offset := Vector2(progress * RECOIL_DISTANCE * -1.0, 0).rotated(angle) if is_flashing else Vector2.ZERO
 	var origin := shoulder + recoil_offset
 	var arm_end := origin + Vector2(ARM_LENGTH, 0).rotated(angle)
-	var gun_end := arm_end + Vector2(GUN_LENGTH, 0).rotated(angle)
-	var perp := Vector2(0, 1).rotated(angle)
 	var arm_color := Color.WHITE if not is_flashing else flash_color
-	var gun_color := Color("#FFD700") if not is_flashing else Color.WHITE
 	draw_line(origin, arm_end, arm_color, 3)
-	draw_line(arm_end, gun_end, gun_color, 5)
-	draw_line(arm_end, arm_end + perp * 8, gun_color, 2)
-	draw_line(gun_end + perp * 3, gun_end - perp * 3, gun_color, 2)
+	var tex := _gun_texture
+	var tex_size := tex.get_size() * GUN_SCALE
+	var offset := Vector2(-tex_size.x * 0.3, -tex_size.y * 0.5)
+	var draw_pos := arm_end + offset.rotated(angle)
+	draw_set_transform(draw_pos, angle, Vector2(GUN_SCALE, GUN_SCALE))
+	draw_texture(tex, Vector2.ZERO)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if is_flashing:
 		var flash_radius := lerpf(16.0, 4.0, 1.0 - progress)
 		var flash_alpha := progress
-		draw_circle(gun_end, flash_radius, Color(1, 1, 0.5, flash_alpha * 0.4))
-		draw_circle(gun_end, flash_radius * 0.5, Color(1, 1, 1, flash_alpha * 0.8))
+		var muzzle_pos := arm_end + Vector2(18.0, 0).rotated(angle)
+		draw_circle(muzzle_pos, flash_radius, Color(1, 1, 0.5, flash_alpha * 0.4))
+		draw_circle(muzzle_pos, flash_radius * 0.5, Color(1, 1, 1, flash_alpha * 0.8))
