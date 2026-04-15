@@ -9,8 +9,7 @@ const ARM_LENGTH := 28.0
 const FLASH_DURATION := 0.08
 const RECOIL_DISTANCE := 8.0
 const GUN_SCALE := 0.04
-const GRIP_OFFSET_X := 0.25
-const MUZZLE_OFFSET_X := 0.95
+const GRIP_OFFSET_X := 0.73
 
 var GunTex: Texture2D
 
@@ -229,15 +228,17 @@ func _draw_arm(shoulder: Vector2, angle: float, flash_timer: float, flash_color:
 	var arm_end := origin + Vector2(ARM_LENGTH, 0).rotated(angle)
 	var arm_color := Color.WHITE if not is_flashing else flash_color
 	draw_line(origin, arm_end, arm_color, 3)
+	var flip_y := -1.0 if (angle > PI / 2.0 or angle < -PI / 2.0) else 1.0
 	var tex := _gun_texture
-	var tex_size := tex.get_size() * GUN_SCALE
-	var grip_pos := arm_end - Vector2(tex_size.x * GRIP_OFFSET_X, 0).rotated(angle)
-	draw_set_transform(grip_pos, angle, Vector2(GUN_SCALE, GUN_SCALE))
-	draw_texture(tex, Vector2(-tex.get_size().x * 0.5, -tex.get_size().y * 0.5))
+	var tex_w := tex.get_size().x
+	var tex_h := tex.get_size().y
+	draw_set_transform(arm_end, angle, Vector2(GUN_SCALE, GUN_SCALE * flip_y))
+	draw_texture(tex, Vector2(-tex_w * GRIP_OFFSET_X, -tex_h * 0.5))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if is_flashing:
+		var barrel_length := tex_w * (1.0 - GRIP_OFFSET_X) * GUN_SCALE
+		var muzzle_pos := arm_end + Vector2(barrel_length, 0).rotated(angle)
 		var flash_radius := lerpf(16.0, 4.0, 1.0 - progress)
 		var flash_alpha := progress
-		var muzzle_pos := arm_end + Vector2(tex_size.x * MUZZLE_OFFSET_X, 0).rotated(angle)
 		draw_circle(muzzle_pos, flash_radius, Color(1, 1, 0.5, flash_alpha * 0.4))
 		draw_circle(muzzle_pos, flash_radius * 0.5, Color(1, 1, 1, flash_alpha * 0.8))

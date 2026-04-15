@@ -5,8 +5,7 @@ signal shot_fired
 
 const ARM_LENGTH := 22.0
 const GUN_SCALE := 0.035
-const GRIP_OFFSET_X := 0.25
-const MUZZLE_OFFSET_X := 0.95
+const GRIP_OFFSET_X := 0.73
 
 var _is_dead: bool = false
 var _reaction_time: float
@@ -85,15 +84,17 @@ func _draw() -> void:
 	var shoulder := Vector2(10, -12)
 	var arm_end := shoulder + Vector2(ARM_LENGTH, 0).rotated(_gun_angle)
 	draw_line(shoulder, arm_end, c, 2)
+	var flip_y := -1.0 if (_gun_angle > PI / 2.0 or _gun_angle < -PI / 2.0) else 1.0
 	var tex := _gun_texture
-	var tex_size := tex.get_size() * GUN_SCALE
-	var grip_pos := arm_end - Vector2(tex_size.x * GRIP_OFFSET_X, 0).rotated(_gun_angle)
-	draw_set_transform(grip_pos, _gun_angle, Vector2(GUN_SCALE, GUN_SCALE))
-	draw_texture(tex, Vector2(-tex.get_size().x * 0.5, -tex.get_size().y * 0.5))
+	var tex_w := tex.get_size().x
+	var tex_h := tex.get_size().y
+	draw_set_transform(arm_end, _gun_angle, Vector2(GUN_SCALE, GUN_SCALE * flip_y))
+	draw_texture(tex, Vector2(-tex_w * GRIP_OFFSET_X, -tex_h * 0.5))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if urgency > 0.5:
 		var glow_alpha := (urgency - 0.5) / 0.5
-		var gun_end := arm_end + Vector2(tex_size.x * MUZZLE_OFFSET_X, 0).rotated(_gun_angle)
+		var barrel_length := tex_w * (1.0 - GRIP_OFFSET_X) * GUN_SCALE
+		var gun_end := arm_end + Vector2(barrel_length, 0).rotated(_gun_angle)
 		draw_circle(gun_end, 5, Color(1, 0.3, 0.0, glow_alpha * 0.5))
 		var target_end := gun_end + Vector2(40, 0).rotated(_gun_angle)
 		draw_line(gun_end, target_end, Color(1, 0.2, 0.2, glow_alpha * 0.3), 1)
