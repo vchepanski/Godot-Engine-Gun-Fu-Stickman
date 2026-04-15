@@ -17,7 +17,9 @@ var _gun_texture: ImageTexture
 
 func _ready() -> void:
 	add_to_group("enemies")
-	_gun_texture = WeaponTex.get_clean_texture()
+	var img := Image.new()
+	img.load("res://assets/weapons/pistol_clean.png")
+	_gun_texture = ImageTexture.create_from_image(img)
 	_reaction_time = randf_range(3.0, 5.0)
 	_timer = Timer.new()
 	_timer.one_shot = true

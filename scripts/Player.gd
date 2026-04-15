@@ -10,6 +10,8 @@ const FLASH_DURATION := 0.08
 const RECOIL_DISTANCE := 8.0
 const GUN_SCALE := 0.1
 
+const GunTex := preload("res://assets/weapons/pistol_clean.png")
+
 var lives: int = MAX_LIVES
 var _is_alive: bool = true
 var _left_touch_index: int = -1
@@ -30,7 +32,9 @@ var _gun_texture: ImageTexture
 
 func _ready() -> void:
 	add_to_group("player")
-	_gun_texture = WeaponTex.get_clean_texture()
+	var img := Image.new()
+	img.load("res://assets/weapons/pistol_clean.png")
+	_gun_texture = ImageTexture.create_from_image(img)
 	_hit_player = AudioStreamPlayer.new()
 	_hit_player.stream = _generate_hit_sound()
 	add_child(_hit_player)
@@ -232,6 +236,6 @@ func _draw_arm(shoulder: Vector2, angle: float, flash_timer: float, flash_color:
 	if is_flashing:
 		var flash_radius := lerpf(16.0, 4.0, 1.0 - progress)
 		var flash_alpha := progress
-		var muzzle_pos := arm_end + Vector2(18.0, 0).rotated(angle)
+		var muzzle_pos := arm_end + Vector2(tex_size.x * 0.7, 0).rotated(angle)
 		draw_circle(muzzle_pos, flash_radius, Color(1, 1, 0.5, flash_alpha * 0.4))
 		draw_circle(muzzle_pos, flash_radius * 0.5, Color(1, 1, 1, flash_alpha * 0.8))

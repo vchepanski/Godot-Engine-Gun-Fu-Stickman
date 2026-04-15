@@ -22,10 +22,6 @@ window/handheld/orientation=1
 2d_physics/layer_2="Enemies"
 2d_physics/layer_3="Bullets"
 
-[autoload]
-
-WeaponTex="*res://scripts/WeaponTex.gd"
-
 [rendering]
 
 renderer/rendering_method="mobile"
