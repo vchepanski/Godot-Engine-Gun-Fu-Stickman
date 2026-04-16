@@ -2,6 +2,7 @@ extends Node2D
 
 const PlayerScene := preload("res://scenes/Player.tscn")
 const EnemyScene := preload("res://scenes/Enemy.tscn")
+const BgTexture := preload("res://assets/backgrounds/back.jpg")
 
 const INITIAL_SPAWN_INTERVAL := 1.5
 const MIN_SPAWN_INTERVAL := 0.25
@@ -23,6 +24,13 @@ func _ready() -> void:
 	_setup_game()
 
 func _setup_game() -> void:
+	var bg := Sprite2D.new()
+	bg.texture = BgTexture
+	bg.position = Vector2(360, 640)
+	bg.scale = Vector2(720.0 / BgTexture.get_width(), 1280.0 / BgTexture.get_height())
+	bg.z_index = -1
+	add_child(bg)
+
 	enemies_container = Node2D.new()
 	enemies_container.name = "Enemies"
 	add_child(enemies_container)
